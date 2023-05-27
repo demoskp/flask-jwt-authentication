@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint, current_app as app
+from flask import request, jsonify, Blueprint
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -8,6 +8,7 @@ from flask_jwt_extended import (
 )
 
 from api.schemas.user import UserCreateSchema, UserSchema
+from app import app
 from auth.helpers import revoke_token, is_token_revoked, add_token_to_database
 from extensions import pwd_context, jwt, db
 from models import User
@@ -46,8 +47,8 @@ def login():
 
     access_token = create_access_token(identity=user.id)
     refresh_token = create_refresh_token(identity=user.id)
-    add_token_to_database(access_token, app.config["JWT_IDENTITY_CLAIM"])
-    add_token_to_database(refresh_token, app.config["JWT_IDENTITY_CLAIM"])
+    add_token_to_database(access_token)
+    add_token_to_database(refresh_token)
 
     return jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200
 
@@ -57,7 +58,7 @@ def login():
 def refresh():
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user)
-    add_token_to_database(access_token, app.config["JWT_IDENTITY_CLAIM"])
+    add_token_to_database(access_token)
     return jsonify({"access_token": access_token}), 200
 
 
@@ -81,7 +82,7 @@ def revoke_refresh_token():
 
 @jwt.user_lookup_loader
 def user_loader_callback(jwt_headers, jwt_payload):
-    identity = jwt_payload["sub"]
+    identity = jwt_payload[app.config["JWT_IDENTITY_CLAIM"]]
     return User.query.get(identity)
 
 

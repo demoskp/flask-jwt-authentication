@@ -9,14 +9,4 @@ class TokenBlocklist(db.Model):
     revoked_at = db.Column(db.DateTime)
     expires = db.Column(db.DateTime, nullable=False)
 
-    user = db.relationship("User", lazy="joined")
-
-    def to_dict(self):
-        return {
-            "token_id": self.id,
-            "jti": self.jti,
-            "token_type": self.token_type,
-            "user_identity": self.user_id,
-            "revoked_at": self.revoked_at,
-            "expires": self.expires,
-        }
+    user = db.relationship("User")

@@ -2,7 +2,7 @@ from flask import Flask
 
 from api.views import blueprint
 from auth.views import auth_blueprint
-from extensions import db, migrate, cors, jwt
+from extensions import db, migrate, jwt
 
 app = Flask(__name__)
 app.register_blueprint(blueprint=blueprint)
